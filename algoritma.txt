@@ -1,0 +1,165 @@
+I am looking at getting the data for room availability and rates 
+(both on cash and points), I am looking at developing an API that 
+is able to do this at scale. The data will need to be refreshed 
+frequently (such as daily) so it would need to be done via an API 
+that is able to take in a hotel name, and then programitically scrape 
+the data for the entire year
+
+Research start Thu OCT 9 01:20
+
+1) website marinett uses url to find rooms which includes parameters for search
+https://www.marriott.com/search/findHotels.mi?fromToDate_submit=10/10/2025&fromDate=10/09/2025&toDate=10/10/2025&toDateDefaultFormat=10/10/2025&fromDateDefaultFormat=10/09/2025&flexibleDateSearch=false&t-start=2025-10-09&t-end=2025-10-10&lengthOfStay=1&childrenCountBox=0+Children+Per+Room&childrenCount=0&clusterCode=none&isAdvanceSearch=false&recordsPerPage=40&destinationAddress.type=State_Province_Region&isInternalSearch=true&vsInitialRequest=false&searchType=InCity&destinationAddress.stateProvince=CA&singleSearchAutoSuggest=Unmatched&destinationAddress.placeId=ChIJPV4oX_65j4ARVW8IJ6IJUYs&for-hotels-nearme=Near&destinationAddress.country=US&collapseAccordian=is-hidden&singleSearch=true&destinationAddress.secondaryText=CA,+US&isTransient=true&initialRequest=true&flexibleDateSearchRateDisplay=false&isSearch=true&isRateCalendar=true&destinationAddress.destination=California,+USA&isHideFlexibleDateCalendar=false&roomCountBox=1+Room&roomCount=1&guestCountBox=1+Adult+Per+Room&numAdultsPerRoom=1&deviceType=desktop-web&view=list&destinationAddress.location=California,+USA&searchRadius=50&fromToDate=10/09/2025&isFlexibleDatesOptionSelected=false&numberOfRooms=1#/2/
+2) First search displays hotels 
+3) hotel pages show rooms (Can't open hotel pages with url)
+4) rooms have a button to see prices 
+5) point prices included when point search is enabled (checkbox no url parameters)
+6) point prices shown with another box near normal prices
+7) first price shown on the room box is either point price or normal flexiable price
+(doesnt need pressing button)
+8) selecting price box displays login
+9) website uses .mi filetype for webpages i got this explanation for .mi 
+Version 3.20 MI files are encoded in Unicode (UTF-8). 
+Files stored to older MI versions are encoded as before, 
+depending on the current locale. When loading older MI formats, 
+the Creo Elements/Direct Drafting loader uses the information recorded 
+in the info section (~1) of the MI file. MI formats without encoding 
+information in their info sections are treated as if encoded in ROMAN8 
+or SJIS (Japanese locale).
+
+!Not sure how thats useful
+
+10) from my researches i find out marriott blocks linux users this can be
+prevented with a not linux user-agent it was 4 months ago so it might still 
+apply
+
+
+11) One of the protection i found is akamai is used for blocking linux users
+
+
+What to do 
+1) check network monitor for everything to see if there is a hidden api 
+2) test captcha limits
+3) test nodriver limits
+4) fetch every information that is possible to scrape either with hidden api 
+or nodriver browser scraping
+
+first notes
+1) https://www.marriott.com/mi/query/phoenixShopDatedSearchByLocationSearchInputQuery
+doesnt have address and other informations inside payload but it does have 
+some details to get hotels
+response include hotels and some information (important)
+2) https://www.marriott.com/mi/query/phoenixShopPropertiesMediaGalleryByIDS
+Has image ids for hotel ids
+has image urls for hotel ids 
+3) https://www.marriott.com/mi/api/shop-renderer/targetSegmentFetch
+has search parameters in the paylod 
+returns an empty segment id 
+
+4) ! Important 
+Seleniumbase failed with or with uc (this might be because it is not called
+is a test class) it got blocked by bot protection
+request got blocked as expected
+Plain selenium was able to search hotels with url 
+Format go to will be nodriver
+
+5) tweaking with browser creation my browser was successfull in fetching data
+as a normal browser would
+
+6) nodriver has a chance to not load the website which breaks scraping
+this most likely is related to my internet
+
+7) my internet is in range of kbps that is probably why i get not loading errors
+
+8) Hotel continue button has a link that opens hotel page 
+example: /reservation/availabilitySearch.mi?propertyCode=OXRTC&isSearch=true&currency=&showFullPrice=false
+
+9) i am now able to scrape data from website hotel search page 
+some of the hotels return as none but i think thats because of js not 
+rendering them yet
+
+here is data example 
+img source:  https://cache.marriott.com//is/image/marriotts7prod/cy-oxrtc-lobby-seating-27531:Wide-Hor?output-quality=90&interpolation=progressive-bilinear&downsize=512px:*
+title:  Courtyard by Marriott Thousand Oaks Agoura Hills
+reviews:  4.3
+description:  Stylish hotel near Malibu with heated saltwater pool!
+hotel link:  https://www.marriott.com//reservation/availabilitySearch.mi?propertyCode=OXRTC&isSearch=true&currency=&showFullPrice=false
+
+10) instead of evaluate i'm using nodriver query selector and other 
+informations from nodriver element object 
+
+11) i have to add a function that waits for the page to load i'm currently 
+sleeping 30 seconds which is not ideal for testing
+
+Taking a break thu OCT 9 04:21
+
+Research and build continue thu OCT 9 15:36
+
+12) i made a very simple code to wait for website to load 
+        start_time = time.time()
+        await page.select(".property-card")
+        end_time = time.time()
+        elapsed = end_time - start_time
+        print(f"Execution time: {elapsed:.2f} seconds")
+    this should be different for each page 
+
+13) Hotel rooms may have points as payment or not have to check for that too
+
+14) website expires sessions after some time and redirects the user
+
+13) website loading wait doesn't work properly because of my internet speed
+i'll just wait 25 seconds for now instead of waiting for element 
+
+14) Maybe because we are rate-limited sometimes website displays we are unable to show to 
+data message that message needs to be tracked and an action according to that shouşd be made
+
+15) current code has problem after activating point prices
+
+16) website is returning rateListMenu.mi so maybe if i get that
+i can use beautiful soup to scrape data 
+
+17) error in 15 is solved by activating points after hotel page loads
+code was not able to find it because room data i had was old after
+point refresh
+
+18) points use a span to show data and we are not able to get innerhtml from it
+so i made a silly workaround and used strings 
+rate_price = str(rate_price).replace('<span class="">','').replace("</span>","")
+
+Taking a break Thu OCT 9 21:03
+
+starting again Fri OCT 10 21:07
+19) yesterday i made the code to save hotel data inside a json file and Shaun liked it but it requires a litle 
+bit of an update
+Dates, prices,need to collect hotel page urls and then go thru them 
+
+20) prices are done 
+
+break Fri OCT 10 21:42
+continue Fri OCT 10 22:46
+
+21) bare minimum search url 
+https://www.marriott.com/search/findHotels.mi?fromDate=10/10/2025&toDate=10/11/2025&destinationAddress.destination=California,+USA&roomCount=1&numAdultsPerRoom=5&childrenCount=2&childrenAges=7,3&deviceType=desktop-web&view=list
+
+22) it takes 15 seconds to fetch one hotel information from SEARCH page 
+
+23) hotels wont load if page is not scrolled down 
+
+24) with nodriver it takes too long to scrape 
+
+25) i'll use nodriver to load js and use bs4 to scrape
+
+26) there are different layouts for rooms make a code that works for all types
+27) after one page activates points the others doesn't need to do that 
+28) different layouts code is not working as properly i need to fix that 
+
+Stopping the work Sat OCT 11 04:21
+
+continue Sat OCT 11 13:00
+29) there are probably more than 2 hotel layout types 
+break 13:46
+continue 17:00 
+30) APİv2 is done it can scrape all types of hotel pages 
+it needs caching system and an api request should first search cache system 
+how ever i'm not sure how that will work now 
+
+break 19:44
