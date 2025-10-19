@@ -9,6 +9,10 @@ import json
 async def address_scraper(search_data):
     print(f"main started at: {datetime.now()}")
     browser = await extension_browser("temp","temp")
+    temp_page = await browser.get("https://www.marriott.com") #making website recognize the ip
+    await asyncio.sleep(15)
+    await temp_page.evaluate("document.querySelector('.update-search-btn').click();")
+    await asyncio.sleep(15)
     try:
 
 
@@ -325,6 +329,10 @@ async def address_scraper(search_data):
 async def code_fetcher(search_data):
     print(f"main started at: {datetime.now()}")
     browser = await extension_browser("temp","temp")
+    temp_page = await browser.get("https://www.marriott.com") #making website recognize the ip
+    await asyncio.sleep(15)
+    await temp_page.evaluate("document.querySelector('.update-search-btn').click();")
+    await asyncio.sleep(15)
     try:
 
 

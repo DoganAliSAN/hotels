@@ -33,7 +33,7 @@ parse_type==0.6.6
 pdbp==1.7.1
 platformdirs==4.5.0
 pluggy==1.6.0
-psycopg2==2.9.11
+psycopg2-binary==2.9.11
 pydantic==2.12.3
 pydantic_core==2.41.4
 Pygments==2.19.2

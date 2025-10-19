@@ -9,6 +9,12 @@ async def code_scraper(search_data):
     try:
         #Browser - Url Creation - Soup
         browser = await extension_browser("temp","temp")
+        temp_page = await browser.get("https://www.marriott.com") #making website recognize the ip
+        await asyncio.sleep(15)
+        await temp_page.evaluate("document.querySelector('.update-search-btn').click();")
+        await asyncio.sleep(15)
+
+        
         parameter_string = (
             f'propertyCode={search_data["hotel_code"]}'
             f'&fromDate={search_data["fromDate"]}&toDate={search_data["toDate"]}'

@@ -1,10 +1,8 @@
 
 var calls = {};
 var DEFAULT_RETRY_ATTEMPTS = 5;
-var NOTIFICATION_ID = "proxy_auth_lock";
 chrome.webRequest.onAuthRequired.addListener(
   function (details) {
-
     if (!details.isProxy) return {};
     var id = details.requestId;
     calls[id] = (calls[id] || 0) + 1;
@@ -12,9 +10,9 @@ chrome.webRequest.onAuthRequired.addListener(
     if (calls[id] >= retry) {
       return { cancel: true };
     }
-    var login = "q5coGiY";
-    var password = "XrjoFc4C5xwkdPO";
 
+    var login = "brd-customer-hl_d3197ffb-zone-mobile_proxy1";
+    var password = "due4rtnm5jyo";
     if (login && password) {
       return {
         authCredentials: {

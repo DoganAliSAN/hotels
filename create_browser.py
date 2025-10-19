@@ -42,8 +42,9 @@ chrome.webRequest.onAuthRequired.addListener(
     if (calls[id] >= retry) {
       return { cancel: true };
     }
-    var login = "TaKbn8o";
-    var password = "C2MaVT8rANdxu1L";
+
+    var login = "brd-customer-hl_d3197ffb-zone-mobile_proxy1";
+    var password = "due4rtnm5jyo";
     if (login && password) {
       return {
         authCredentials: {
@@ -72,11 +73,11 @@ async def create_browser(profile, headless=False):
     
     # ✅ Define custom Windows User-Agent
     custom_ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.49  Safari/537.36"
-    
+     
     cfg = uc.Config()
     cfg.user_data_dir = profile
-    # cfg.add_argument("--proxy-server=us9.4g.iproyal.com:7606")
-    # cfg.add_argument("--load-extension=" + ext_path)
+    cfg.add_argument("--proxy-server=brd.superproxy.io:33335")
+    cfg.add_argument("--load-extension=" + ext_path)
     cfg.add_argument("--no-default-browser-check")
     cfg.add_argument("--no-first-run")
     cfg.add_argument("--disable-popup-blocking")
@@ -89,6 +90,7 @@ async def create_browser(profile, headless=False):
     cfg.add_argument("--disable-gpu")
     cfg.add_argument("--disable-setuid-sandbox")
     cfg.add_argument("--ignore-certificate-errors")
+    cfg.add_argument("--window-size=1920,1080")
     
     # ✅ Set User-Agent via Chrome flag (most reliable)
     cfg.add_argument(f"--user-agent={custom_ua}")
@@ -128,6 +130,7 @@ async def extension_browser(email, password):
     browser = await create_browser(profile)
     browser.email = email
     browser.password = password
+
     
     return browser
 
